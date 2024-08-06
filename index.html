@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Camera Viewer</title>
+        <style>
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+                background-color: #f0f0f0;
+            }
+            #camera-container {
+                width: 80%;
+                max-width: 600px;
+                border: 2px solid #ccc;
+                padding: 10px;
+                background-color: #fff;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                text-align: center;
+            }
+            video {
+                width: 100%;
+                height: auto;
+                transform: scaleX(-1); /* Отражение видео по горизонтали */
+            }
+            .error-message {
+                color: red;
+                font-size: 18px;
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="camera-container">
+            <video id="video" autoplay></video>
+            <div id="error-message" class="error-message">
+                Разрешите доступ к камере
+            </div>
+        </div>
+        <script>
+            async function startCamera() {
+                const video = document.getElementById("video");
+                const errorMessage = document.getElementById("error-message");
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: true,
+                    });
+                    video.srcObject = stream;
+                    video.style.display = "block";
+                    errorMessage.style.display = "none";
+                } catch (err) {
+                    console.error("Error accessing the camera: ", err);
+                    video.style.display = "none";
+                    errorMessage.style.display = "block";
+                }
+            }
+
+            window.addEventListener("load", startCamera);
+        </script>
+    </body>
+</html>
