@@ -32,6 +32,15 @@
                 font-size: 18px;
                 display: none;
             }
+            .controls {
+                margin-top: 10px;
+            }
+            .controls button {
+                padding: 8px 16px;
+                margin: 5px;
+                font-size: 16px;
+                cursor: pointer;
+            }
         </style>
     </head>
     <body>
@@ -40,15 +49,30 @@
             <div id="error-message" class="error-message">
                 Разрешите доступ к камере
             </div>
+            <div class="controls">
+                <button id="muteButton">Выключить микрофон</button>
+                <button id="videoButton">Выключить видео</button>
+            </div>
         </div>
         <script>
+            let stream;
+            let audioTrack;
+            let videoTrack;
+            let isAudioMuted = false;
+            let isVideoOff = false;
+
             async function startCamera() {
                 const video = document.getElementById("video");
                 const errorMessage = document.getElementById("error-message");
                 try {
-                    const stream = await navigator.mediaDevices.getUserMedia({
+                    stream = await navigator.mediaDevices.getUserMedia({
                         video: true,
+                        audio: true,
                     });
+
+                    audioTrack = stream.getAudioTracks()[0];
+                    videoTrack = stream.getVideoTracks()[0];
+
                     video.srcObject = stream;
                     video.style.display = "block";
                     errorMessage.style.display = "none";
@@ -58,6 +82,33 @@
                     errorMessage.style.display = "block";
                 }
             }
+
+            function toggleAudio() {
+                if (audioTrack) {
+                    isAudioMuted = !isAudioMuted;
+                    audioTrack.enabled = !isAudioMuted;
+                    document.getElementById("muteButton").textContent =
+                        isAudioMuted
+                            ? "Включить микрофон"
+                            : "Выключить микрофон";
+                }
+            }
+
+            function toggleVideo() {
+                if (videoTrack) {
+                    isVideoOff = !isVideoOff;
+                    videoTrack.enabled = !isVideoOff;
+                    document.getElementById("videoButton").textContent =
+                        isVideoOff ? "Включить видео" : "Выключить видео";
+                }
+            }
+
+            document
+                .getElementById("muteButton")
+                .addEventListener("click", toggleAudio);
+            document
+                .getElementById("videoButton")
+                .addEventListener("click", toggleVideo);
 
             window.addEventListener("load", startCamera);
         </script>
